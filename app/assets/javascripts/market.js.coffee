@@ -8,6 +8,8 @@
 #
 #= require bootstrap
 #= require bootstrap-switch.min
+#= require charting_library.min
+#= require dataAdaptor
 #
 #= require moment
 #= require bignumber
@@ -57,7 +59,8 @@ $ ->
   GlobalData.attachTo(document, {pusher: window.pusher})
   MemberData.attachTo(document, {pusher: window.pusher}) if gon.accounts
 
-  CandlestickUI.attachTo('#candlestick')
+  #CandlestickUI.attachTo('#candlestick')
+  TradingChartUI.attachTo('#candlestick')
   SwitchUI.attachTo('#range_switch, #indicator_switch, #main_indicator_switch, #type_switch')
 
   $('.panel-body-content').niceScroll

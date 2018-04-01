@@ -1,7 +1,7 @@
 @MarketData = flight.component ->
 
   @load = (event, data) ->
-    @trigger 'market::candlestick::request'
+    @trigger 'market::candlestick::request', data
     @reqK gon.market.id, data['x']
 
   @reqK = (market, minutes, limit = 768) ->
@@ -101,17 +101,17 @@
       @last_ts = 0
     @next_ts = @last_ts + 60*minutes
 
-    @deliverTrades 'market::candlestick::response'
+    @deliverTrades 'market::candlestick::response', data
 
-  @deliverTrades = (event) ->
+  @deliverTrades = (event, data) ->
     @processTrades()
 
     # skip the first point
-    @trigger event,
-      minutes: @points.minutes
-      candlestick: @points.candlestick.slice(1)
-      close: @points.close.slice(1)
-      volume: @points.volume.slice(1)
+    @trigger event, data
+      #minutes: @points.minutes
+      #candlestick: @points.candlestick.slice(1)
+      #close: @points.close.slice(1)
+      #volume: @points.volume.slice(1)
 
     # we only need to keep the last 2 points for future calculation
     @points.close = @points.close.slice(-2)
@@ -120,11 +120,11 @@
 
   @hardRefresh = (threshold) ->
     ts = Math.round( new Date().valueOf()/1000 )
-
+    @reqK gon.market.id, @minutes
     # if there's no trade received in `threshold` seconds, request server side data
-    if ts > @updated_at + threshold
-      @refreshUpdatedAt()
-      @reqK gon.market.id, @minutes
+    #if ts > @updated_at + threshold
+      #@refreshUpdatedAt()
+      #@reqK gon.market.id, @minutes
 
   @startDeliver = (event, data) ->
     if @interval?
@@ -132,7 +132,7 @@
 
     deliver = =>
       if @tradesCache.length > 0
-        @deliverTrades 'market::candlestick::trades'
+        @deliverTrades 'market::candlestick::trades', data
       else
         @hardRefresh(300)
 
